@@ -1,7 +1,7 @@
 import requests
 import json
 
-url = f'https://api.keepa.com/deal?key=7shsdsmam3tg745bicbo6eek3l0h9hf0a7i06a1otjpsb05d188kslln8h0jtsds'
+url = f'https://api.keepa.com/deal?key=<Your Keepa API Key>'
 queryJSON = {
     "page": 65,
     "domainId": 1,
