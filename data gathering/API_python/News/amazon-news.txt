@@ -1,0 +1,21 @@
+ published_at , author , title 
+2021-09-09T16:33:26Z,Jon Fingas,Amazon will pay full college tuition for some warehouse workers
+2021-09-01T19:52:45Z,Devindra Hardawar,SpaceX says Amazon is trying to delay Starlink because it can't compete
+2021-09-14T14:28:20Z,Sarah Perez,Amazon partners with AXS to install Amazon One palm readers at entertainment venues
+2021-09-14T09:49:19Z,James Vincent,Amazon One¡¯s palm-scanning tech makes first move into entertainment venues
+2021-09-07T13:15:23Z,Valentina Palladino,Apple's iPad Air drops to $500 at Amazon
+2021-09-06T19:12:34Z,Kris Holt,California could force Amazon to improve conditions for warehouse workers
+2021-08-19T12:29:54Z,Saqib Shah,Amazon is reportedly planning to open mini department stores
+2021-09-08T15:00:18Z,Kris Holt,Senator Warren urges Amazon to tackle COVID-19 misinformation
+2021-09-10T22:45:31Z,Cherlynn Low,Amazon is updating Kindles to make them easier to navigate
+2021-08-28T04:37:07Z,Mariella Moon,Amazon disables ISIS propaganda website using AWS to host content
+2021-09-02T12:53:14Z,Valentina Palladino,Apple's Mac Mini M1 drops down to $600 at Amazon
+2021-08-27T20:49:09Z,Dana Wollman,Amazon is working on a buy-now-pay-later option
+2021-08-23T13:00:00Z,Decca Muldowney,"As demand for bikes surged, Amazon got in the way"
+2021-08-19T18:44:13Z,Catie Keck,Prime Video releases new profile images for Amazon originals
+2021-08-27T14:39:28Z,Antonio G. Di Benedetto,"Razer gaming mice, headsets, and more are discounted at Amazon"
+2021-09-07T22:20:00Z,Dharna Noor,Amazon Invests in the Amazon Rainforest Instead of Just Paying Its Damn Taxes
+2021-08-20T15:50:10Z,Valentina Palladino,"Apple's AirPods Pro fall to $180, plus the rest of the week's best tech deals"
+2021-08-25T19:39:06Z,Jay Peters,Amazon¡¯s New World MMO is getting an open beta on September 9th
+2021-09-04T14:44:48Z,Jon Fingas,Amazon Eero 6 WiFi router packs are up to 38 percent off for Labor Day
+2021-09-10T16:25:45Z,Valentina Palladino,"Apple's iPad Air is $100 off right now, plus the rest of the week's best tech deals"
