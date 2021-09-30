@@ -1,0 +1,119 @@
+<html>
+<head>
+<title>python_cleaning_text data.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #000080; font-weight: bold;}
+.s1 { color: #000000;}
+.s2 { color: #008000; font-weight: bold;}
+.s3 { color: #808080; font-style: italic;}
+.s4 { color: #0000ff;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+python_cleaning_text data.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span>pandas <span class="s0">as </span>pd
+<span class="s0">import </span>matplotlib.pyplot <span class="s0">as </span>plt
+<span class="s0">import </span>numpy <span class="s0">as </span>np
+<span class="s0">from </span>sklearn.feature_extraction.text <span class="s0">import </span>CountVectorizer
+<span class="s0">from </span>sklearn.decomposition <span class="s0">import </span>LatentDirichletAllocation
+
+path = <span class="s2">&quot;D:/Jieqian Liu/Data Science and Analystics/ANLY501 Data Science &amp; Analytics/Individual Project Profolio/data gathering/API_R/News/&quot;</span>
+file = <span class="s2">&quot;online-shopping.csv&quot;</span>
+CSV_DF = pd.read_csv(path + file)
+
+print(CSV_DF.head())
+<span class="s3"># iterating the columns</span>
+<span class="s0">for </span>col <span class="s0">in </span>CSV_DF.columns:
+    print(col)
+
+<span class="s3"># REMOVE any rows with NaN in them</span>
+CSV_DF = CSV_DF.dropna()
+<span class="s3"># Create the list of description</span>
+DescriptionLIST = []
+<span class="s0">for </span>next1 <span class="s0">in </span>CSV_DF[<span class="s2">&quot;description&quot;</span>]:
+    DescriptionLIST.append(next1)
+
+print(<span class="s2">&quot;The description list is&quot;</span>)
+print(DescriptionLIST)
+
+<span class="s3"># Vectorized</span>
+MyCountV = CountVectorizer(
+    input=<span class="s2">&quot;content&quot;</span>,
+    lowercase=<span class="s0">True</span>,
+    stop_words=<span class="s2">&quot;english&quot;</span>
+)
+
+MyDTM = MyCountV.fit_transform(DescriptionLIST)  <span class="s3"># create a sparse matrix</span>
+print(type(MyDTM))
+<span class="s3"># vocab is a vocabulary list</span>
+vocab = MyCountV.get_feature_names()  <span class="s3"># change to a list</span>
+print(list(vocab)[<span class="s4">10</span>:<span class="s4">20</span>])
+
+MyDTM = MyDTM.toarray()  <span class="s3"># convert to a regular array</span>
+print(type(MyDTM))
+
+ColumnNames = MyCountV.get_feature_names()
+MyDTM_DF = pd.DataFrame(MyDTM, columns=ColumnNames)
+print(MyDTM_DF)
+
+num_topics = <span class="s4">5</span>
+
+lda_model_DH = LatentDirichletAllocation(n_components=num_topics,
+                                         max_iter=<span class="s4">100</span>, learning_method=<span class="s2">'online'</span>)
+LDA_DH_Model = lda_model_DH.fit_transform(MyDTM_DF)
+
+print(<span class="s2">&quot;SIZE: &quot;</span>, LDA_DH_Model.shape)  <span class="s3"># (NO_DOCUMENTS, NO_TOPICS)</span>
+
+<span class="s3"># Let's see how the first document in the corpus looks like in</span>
+<span class="s3">## different topic spaces</span>
+print(<span class="s2">&quot;First description...&quot;</span>)
+print(LDA_DH_Model[<span class="s4">0</span>])
+print(<span class="s2">&quot;Sixth description...&quot;</span>)
+print(LDA_DH_Model[<span class="s4">5</span>])
+
+<span class="s3">## implement a print function</span>
+<span class="s0">def </span>print_topics(model, vectorizer, top_n=<span class="s4">10</span>):
+    <span class="s0">for </span>idx, topic <span class="s0">in </span>enumerate(model.components_):
+        print(<span class="s2">&quot;Topic:  &quot;</span>, idx)
+
+        print([(vectorizer.get_feature_names()[i], topic[i])
+               <span class="s0">for </span>i <span class="s0">in </span>topic.argsort()[:-top_n - <span class="s4">1</span>:-<span class="s4">1</span>]])
+        <span class="s3">## gets top n elements in decreasing order</span>
+
+<span class="s3"># call the function above with our model and CountV</span>
+print_topics(lda_model_DH, MyCountV)
+
+word_topic = np.array(lda_model_DH.components_)
+<span class="s3"># print(word_topic)</span>
+word_topic = word_topic.transpose()
+
+num_top_words = <span class="s4">15</span>
+vocab_array = np.asarray(vocab)
+
+<span class="s3"># fontsize_base = 70 / np.max(word_topic)  # font size for word with largest share in corpus</span>
+fontsize_base = <span class="s4">15</span>
+
+<span class="s0">for </span>t <span class="s0">in </span>range(num_topics):
+    plt.subplot(<span class="s4">1</span>, num_topics, t + <span class="s4">1</span>)  <span class="s3"># plot numbering starts with 1</span>
+    plt.ylim(<span class="s4">0</span>, num_top_words + <span class="s4">0.5</span>)  <span class="s3"># stretch the y-axis to accommodate the words</span>
+    plt.xticks([])  <span class="s3"># remove x-axis markings ('ticks')</span>
+    plt.yticks([])  <span class="s3"># remove y-axis markings ('ticks')</span>
+    plt.title(<span class="s2">'Topic #{}'</span>.format(t))
+    top_words_idx = np.argsort(word_topic[:, t])[::-<span class="s4">1</span>]  <span class="s3"># descending order</span>
+    top_words_idx = top_words_idx[:num_top_words]
+    top_words = vocab_array[top_words_idx]
+    top_words_shares = word_topic[top_words_idx, t]
+    <span class="s0">for </span>i, (word, share) <span class="s0">in </span>enumerate(zip(top_words, top_words_shares)):
+        plt.text(<span class="s4">0.3</span>, num_top_words - i - <span class="s4">0.5</span>, word, fontsize=fontsize_base)
+        <span class="s3">##fontsize_base*share)</span>
+
+plt.tight_layout()
+plt.show()
+</pre>
+</body>
+</html>

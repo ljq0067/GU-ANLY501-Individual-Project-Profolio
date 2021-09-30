@@ -1,0 +1,141 @@
+---
+title: "Data Cleaning about Record Data"
+author: "Jieqian Liu"
+date: "9/28/2021"
+output: 
+  html_document: default
+  pdf_document: default
+---
+### Read data
+```{r}
+library("selectr")
+library("rvest")
+library("xml2")
+library(rtweet)
+library(twitteR)
+library(ROAuth)
+library(jsonlite)
+library(ggplot2)
+
+## My Twitter Dev APIs
+consumerKey=as.character('27ABsemCQV0ma3NEOD6OpPLCh')
+consumerSecret=as.character('md1etoLaJmeAZBrstaojla2eUvUxH12eH5IRtqB0R38ETnUz6k')
+access_Token=as.character('1423271293097582595-7B60uKGYwIBXIawZvBkLFEd8AXicdj')
+access_Secret=as.character('YLNAiXvQMyP0CjVgjY5qHyi3kgL8StAMIUm3tXr4Ax12n')
+
+
+requestURL='https://api.twitter.com/oauth/request_token'
+accessURL='https://api.twitter.com/oauth/access_token'
+authURL='https://api.twitter.com/oauth/authorize'
+
+setup_twitter_oauth(consumerKey,consumerSecret,access_Token,access_Secret)
+
+terms = c("online-shoppinh", "Online shopping", "Online Shopping", "online shopping", "Amazon ","amazon ", "ebay", "Ebay")
+terms = paste(terms, collapse = " OR ")
+
+Search1<-twitteR::searchTwitter(terms,n=1000, since="2021-03-01", lang="en")
+Search_DF2 <- twListToDF(Search1)
+```
+
+### Remove all columns/variables not needed.
+
+```{r}
+str(Search_DF2)
+head(Search_DF2, n=15)
+
+## Variable (also called features, attributes, columns) Name
+colnames(Search_DF2)
+
+# Remove all columns/variables not needed.
+head(Search_DF2)
+Search_DF2 <-Search_DF2[-c(4,7,9,10,11,15,16)]
+# Look again
+str(Search_DF2)
+head(Search_DF2)
+```
+### Missing value
+```{r}
+sum(is.na(Search_DF2$favoriteCount))
+summary(Search_DF2$favoriteCount)
+
+sum(is.na(Search_DF2$retweetCount))
+summary(Search_DF2$retweetCount)
+```
+
+```{r}
+(MyPlotAFTER<-ggplot(Search_DF2, 
+                     aes(x=isRetweet, fill=isRetweet)) + 
+    geom_bar()+
+    geom_text(stat='count',aes(label=..count..),vjust=2)+
+    ggtitle("Number of Favorite"))
+
+```
+
+### Outliers
+
+```{r}
+colors=c("lightblue", "darkgreen", "red", "purple")
+par(mfrow = c(2, 2))  # subplots 2 by 2
+
+  # store data 
+  x <- Search_DF2[,3]
+  
+  # Plot histogram of x
+  boxplot(x,
+          main = names(Search_DF2)[3],
+          xlab = names(Search_DF2)[3],
+          col=colors[1]
+  )
+   # store data 
+  x <- Search_DF2[,7]
+  
+  # Plot histogram of x
+  boxplot(x,
+          main = names(Search_DF2)[7],
+          xlab = names(Search_DF2)[7],
+          col=colors[2]
+  )
+
+(favorite_BP<-ggplot(Search_DF2, aes(x="", y = retweetCount, label=retweetCount, fill=isRetweet))+
+    geom_violin(trim=TRUE)+
+    geom_jitter(position=position_jitter(.01), aes(color=retweetCount))+
+    ggtitle("retweetCount"))
+```
+### Correlations
+```{r}
+library(GGally)
+ggpairs(Search_DF2[,c(2,3,5,7)], mapping=ggplot2::aes())
+```
+###  Transformation and normalization
+```{r}
+Search_DF2$RETWEETHOT<- 
+  cut(Search_DF2$retweetCount, breaks = c(-1, 0, 100, 500, 1000, Inf),
+      labels = c("none", "little", "some", "many", "popular"))
+
+
+(MyL1_Age_Waist<-ggplot(Search_DF2, 
+                        aes(x=RETWEETHOT, y=favoriteCount, fill=retweetCount))+
+    geom_boxplot()+
+    geom_jitter(position=position_jitter(.01), aes(fill=retweetCount))+
+    ggtitle("tweet hot and favorite"))
+
+## Normalization
+(Search_DF2_just_numeric <- 
+   Search_DF2[,c(3,7)])
+
+My_Min_Max_Function <- function(x) {
+  MyMax=max(x)
+  MyMin = min(x)
+  Diff = MyMax - MyMin
+  normVal = x/(Diff)
+  return(normVal)
+}
+
+(Search_DF2_just_numeric <- My_Min_Max_Function(Search_DF2_just_numeric))
+
+```
+### Write the two dataframes to csv files
+```{r}
+write.csv(Search_DF2_just_numeric, "twitter_clean_Norm_Numeric.csv")
+write.csv(Search_DF2, "twitter_clean.csv")
+```
